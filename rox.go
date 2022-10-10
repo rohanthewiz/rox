@@ -64,7 +64,7 @@ func New(opts ...Options) *Rox {
 	return r
 }
 
-// Match returns the handler to use and path params
+/*// Match returns the handler to use and path params
 // matched the given method and path.
 //
 // If there is no registered handler that applies to the given method and path,
@@ -72,10 +72,12 @@ func New(opts ...Options) *Rox {
 func (r *Rox) Match(method string, path string) (h RoxHandler, params Params) {
 	t := r.selectTree(method)
 	if t != nil {
-		h = t.match(path, &params)
+		hdlr, _ := t.match(path, &params)
+		h = hdlr
 	}
 	return
 }
+*/
 
 // Serve dispatches the request to the first handler
 // which matches to req.Method and req.Path.
@@ -122,7 +124,6 @@ func (r *Rox) prepareServer() fasthttp.RequestHandler {
 		}
 	}
 	r.notFoundHandler = notFoundHandler
-	// ----
 
 	// Get Master handler
 	var mainReqHandler fasthttp.RequestHandler
@@ -157,19 +158,19 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			path := string(ctx.Path())
 
 			if h := t.staticMatch(path); h != nil {
-				fmt.Println("We have a direct match for -", path)
+				fmt.Println("Direct match:", path)
 				h(ctx, params)
 				return
 			}
 
-			h := t.patternMatch(path, &params)
-			if h != nil {
-				fmt.Println("We have a pattern match for -", path)
+			h, patt := t.patternMatch(path, &params)
+			if r.Options.Verbose && h != nil && patt != "" {
+				fmt.Println("Pattern match:", path, "->", patt)
 				h(ctx, params)
 				return
 			}
 
-			msg := "Unknown Route (404) for " + path
+			msg := "Unknown Route (404) " + path
 			log.Println(msg)
 			r.notFoundHandler(ctx)
 

@@ -77,7 +77,7 @@ func (t *tree) staticMatch(path string) RoxHandler {
 	return nil
 }
 
-func (t *tree) patternMatch(path string, params *Params) (h RoxHandler) {
+func (t *tree) patternMatch(path string, params *Params) (h RoxHandler, pattern string) {
 	verb := ""
 	if t.supportVerb {
 		path, verb = splitURLPath(path)
@@ -180,6 +180,7 @@ OUTER:
 		params.path = path
 		params.names = t.routes[i].p.fields
 		h = t.routes[i].h
+		pattern = t.routes[i].p.pattern
 	}
 	return
 }
@@ -207,10 +208,10 @@ func (t *tree) matchReParam(state, sc int, segment string) int {
 }
 
 // match returns the handler and path parameters that matches the given path.
-func (t *tree) match(path string, params *Params) (h RoxHandler) {
+func (t *tree) match(path string, params *Params) (h RoxHandler, pattern string) {
 	if t.canBeStatic[len(path)] {
 		if handler, found := t.static[path]; found {
-			return handler
+			return handler, pattern
 		}
 	}
 	return t.patternMatch(path, params)

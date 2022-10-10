@@ -2,12 +2,20 @@ RoxRouter
 =========
 
 RoxRouter is based off of the wonderful pattern matching algorithm of [apirouter](https://godoc.org/github.com/cnotch/apirouter)
-married to [fasthttp](https://github.com/valyala/fasthttp). It should be a very fast minimalistic server, and should make a great staring point for your next project once we come out of alpha.
+married to [fasthttp](https://github.com/valyala/fasthttp). It should be a very fast minimalistic server, and should make a great starting point for your next project once we come out of alpha.
+
+### Why Rox?
+- You are looking for a light Router that doesn't try to do everything for you.
+- You need minimal dependencies - we include only those of fasthttp!
+- You need something robust - Testing built in
+- You need flexible static and dynamic routing - Thanks to APIRouter and fasthttp
+- You need something fast - Fasthttp is the fastest server for Go, period.
 
 ### Project Status
 Alpha - not recommended for Production as yet
 
 ### Example
+(See also rox_test.go)
 
 ```go
 package main
