@@ -1,14 +1,11 @@
 RoxRouter
 =========
 
-RoxRouter is based off of the pattern matching algorithm of [apirouter](https://godoc.org/github.com/cnotch/apirouter)
-married to [fasthttp](https://github.com/valyala/fasthttp). It should be very fast minimal server and should make a great staring point for you next project once we come out of alpha.
-
-### Note
-This is expirmental software and as such *should not* be used in Production as yet.
+RoxRouter is based off of the wonderful pattern matching algorithm of [apirouter](https://godoc.org/github.com/cnotch/apirouter)
+married to [fasthttp](https://github.com/valyala/fasthttp). It should be a very fast minimalistic server, and should make a great staring point for your next project once we come out of alpha.
 
 ### Project Status
-Alpha
+Alpha - not recommended for Production as yet
 
 ### Example
 
@@ -25,7 +22,7 @@ func main() {
 	r := rox.New(rox.Options{
 		Verbose: true,
 		Port:    "3020",
-		TLS: rox.RxTLS{
+		TLS: rox.TLSOpts {
 			UseTLS:   false,
 			CertFile: "/etc/letsencrypt/live/mysite.com/cert.pem",
 			KeyFile:  "/etc/letsencrypt/live/mysite.com/privkey.pem",
