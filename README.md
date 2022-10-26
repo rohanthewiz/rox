@@ -11,8 +11,8 @@ married to [Fasthttp](https://github.com/valyala/fasthttp). It is a fast and min
 - You need flexible static and dynamic routing - Thanks to APIRouter and Fasthttp
 - You need something fast - Fasthttp is the fastest server for Go, period. See https://web-frameworks-benchmark.netlify.app/result.
 
-### Project Status
-Alpha
+### Project Status - Alpha
+In your projects, be sure to use the same version of Fasthttp as used by Rox -- current 1.41.0
 
 ### Example
 (See also test cases in rox_test.go)
