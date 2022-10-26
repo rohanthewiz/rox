@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rohanthewiz/rox/core/cors"
 	"github.com/valyala/fasthttp"
 )
 
@@ -122,7 +121,7 @@ func initTestRox() *Rox {
 	)
 
 	// CORS middleware
-	r.Use(cors.MidWareCors, fasthttp.StatusNotImplemented)
+	r.Use(MidWareCors, fasthttp.StatusNotImplemented)
 
 	// Add routes for static files
 	r.AddStaticFilesRoute("/images/", "dist_test/images", 1)

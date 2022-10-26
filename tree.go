@@ -22,10 +22,10 @@ const (
 // route stores the route entry in the router
 type route struct {
 	p Pattern
-	h RoxHandler
+	h Handler
 }
 
-func (rt route) key() string { return rt.p.key }
+func (rt route) key() string { return rt.p.Key() }
 
 func code(c byte) int {
 	return int(c) + codeOffset
@@ -45,21 +45,21 @@ type tree struct {
 	// routes the list of route entry
 	routes []route
 
-	// res parameter validation regular expressions
-	res []*regexp.Regexp
+	// Regs parameter validation regular expressions
+	Regs []*regexp.Regexp
 
 	// static pattern is handled separately
 	// Learn from aero (https://github.com/aerogo/aero)
-	static      map[string]RoxHandler
+	static      map[string]Handler
 	canBeStatic [2048]bool
 
 	supportVerb bool
 }
 
-func (t *tree) add(p Pattern, h RoxHandler) {
+func (t *tree) Add(p Pattern, h Handler) {
 	if len(p.fields) == 0 { // static
 		if t.static == nil {
-			t.static = make(map[string]RoxHandler)
+			t.static = make(map[string]Handler)
 		}
 		t.static[p.pattern] = h
 		t.canBeStatic[len(p.pattern)] = true
@@ -68,7 +68,7 @@ func (t *tree) add(p Pattern, h RoxHandler) {
 	}
 }
 
-func (t *tree) staticMatch(path string) RoxHandler {
+func (t *tree) StaticMatch(path string) Handler {
 	if t.canBeStatic[len(path)] {
 		if h, found := t.static[path]; found {
 			return h
@@ -77,7 +77,7 @@ func (t *tree) staticMatch(path string) RoxHandler {
 	return nil
 }
 
-func (t *tree) patternMatch(path string, params *Params) (h RoxHandler, pattern string) {
+func (t *tree) PatternMatch(path string, params *Params) (h Handler, pattern string) {
 	verb := ""
 	if t.supportVerb {
 		path, verb = splitURLPath(path)
@@ -136,7 +136,7 @@ OUTER:
 			}
 
 			// regular expression parameters are not required in most cases
-			if len(t.res) > 0 {
+			if len(t.Regs) > 0 {
 				// try match regular expressions
 				state = t.matchReParam(state, sc, path[begin:i])
 			}
@@ -185,19 +185,19 @@ OUTER:
 	return
 }
 
-// regular expressions parameter include ':' + res[index]
+// regular expressions parameter include ':' + Regs[index]
 func (t *tree) matchReParam(state, sc int, segment string) int {
 	next := t.base[state] + code('=')
 	if next < sc && state == t.check[next] {
 		reState := next
 		// check regular expressions
-		for j := 0; j < len(t.res); j++ {
+		for j := 0; j < len(t.Regs); j++ {
 			next := t.base[reState] + j + codeOffset
 			if next >= sc {
 				break
 			}
 			if reState == t.check[next] { // exist  parameter reg expressions
-				if t.res[j].MatchString(segment) {
+				if t.Regs[j].MatchString(segment) {
 					state = next // ok
 					break
 				}
@@ -208,16 +208,16 @@ func (t *tree) matchReParam(state, sc int, segment string) int {
 }
 
 // match returns the handler and path parameters that matches the given path.
-func (t *tree) match(path string, params *Params) (h RoxHandler, pattern string) {
+func (t *tree) match(path string, params *Params) (h Handler, pattern string) {
 	if t.canBeStatic[len(path)] {
 		if handler, found := t.static[path]; found {
 			return handler, pattern
 		}
 	}
-	return t.patternMatch(path, params)
+	return t.PatternMatch(path, params)
 }
 
-func (t *tree) init() {
+func (t *tree) Init() {
 	// sort and de-duplicate
 	t.rearrange()
 	t.grow((len(t.routes) + 1) * 2)

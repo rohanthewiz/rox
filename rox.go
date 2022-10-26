@@ -1,6 +1,7 @@
 package rox
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"regexp"
@@ -11,9 +12,6 @@ import (
 const defaultPort = "8800"
 const defaultTLSPort = "443"
 const ipAny = "0.0.0.0"
-
-// RoxHandler handles HTTP requests.
-type RoxHandler func(ctx *fasthttp.RequestCtx, params Params)
 
 // Rox is our core router
 type Rox struct {
@@ -52,7 +50,7 @@ type TLSOpts struct {
 // New returns a new Rox which is initialized with
 // the given options and default pattern style.
 //
-// The syntax of the pattern reference rox.NewPattern.
+// For the syntax of the pattern reference rox.NewPattern.
 func New(opts ...Options) *Rox {
 	r := &Rox{
 		// notFoundHandler: http.NotFoundHandler(),
@@ -63,21 +61,6 @@ func New(opts ...Options) *Rox {
 	}
 	return r
 }
-
-/*// Match returns the handler to use and path params
-// matched the given method and path.
-//
-// If there is no registered handler that applies to the given method and path,
-// Match returns a nil handler and an empty path parameters.
-func (r *Rox) Match(method string, path string) (h RoxHandler, params Params) {
-	t := r.selectTree(method)
-	if t != nil {
-		hdlr, _ := t.match(path, &params)
-		h = hdlr
-	}
-	return
-}
-*/
 
 // Serve dispatches the request to the first handler
 // which matches to req.Method and req.Path.
@@ -146,7 +129,7 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 		}
 
 		// See if we match a file handler
-		fileHander, ok := r.GetFSHandler(ctx)
+		fileHander, ok := r.getFSHandler(ctx)
 		if ok {
 			fileHander(ctx)
 			return
@@ -157,13 +140,13 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			var params Params
 			path := string(ctx.Path())
 
-			if h := t.staticMatch(path); h != nil {
+			if h := t.StaticMatch(path); h != nil {
 				fmt.Println("Direct match:", path)
 				h(ctx, params)
 				return
 			}
 
-			h, patt := t.patternMatch(path, &params)
+			h, patt := t.PatternMatch(path, &params)
 			if r.Options.Verbose && h != nil && patt != "" {
 				fmt.Println("Pattern match:", path, "->", patt)
 				h(ctx, params)
@@ -186,15 +169,15 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 }
 
 func (r *Rox) initTrees() {
-	r.get.init()
-	r.post.init()
-	r.delete.init()
-	r.put.init()
-	r.patch.init()
-	r.head.init()
-	r.connect.init()
-	r.trace.init()
-	r.options.init()
+	r.get.Init()
+	r.post.Init()
+	r.delete.Init()
+	r.put.Init()
+	r.patch.Init()
+	r.head.Init()
+	r.connect.Init()
+	r.trace.Init()
+	r.options.Init()
 }
 
 // selectTree returns the tree by the given HTTP method.
@@ -221,4 +204,32 @@ func (r *Rox) selectTree(method string) *tree {
 	default:
 		return nil
 	}
+}
+
+type AssetPath struct {
+	Prefix         []byte // url prefix
+	FileSystemRoot string // file locations
+	StripSlashes   int    // how many slash words to strip from the url prefix
+}
+
+// Add a route to static files
+// Prefix is a starting portion of the URL delimited by slashes
+// fsRoot is the path to the top-level folder to serve files from
+// StripSlashes is the number of slash delimited tokens to remove from the URL
+// before appending it to the fsRoot to form the full file path
+// Example: rx.AddStaticFilesRoute("/images/", "artifacts/images", 1)
+func (r *Rox) AddStaticFilesRoute(prefix, fsRoot string, slashesToStrip int) {
+	ap := AssetPath{Prefix: []byte(prefix), FileSystemRoot: fsRoot, StripSlashes: slashesToStrip}
+	r.Options.assetPaths = append(r.Options.assetPaths, ap)
+}
+
+// See if we match a file handler - First match is the one we use
+func (r *Rox) getFSHandler(ctx *fasthttp.RequestCtx) (handler fasthttp.RequestHandler, ok bool) {
+	path := ctx.Path()
+	for _, astPath := range r.Options.assetPaths {
+		if bytes.HasPrefix(path, astPath.Prefix) {
+			return fasthttp.FSHandler(astPath.FileSystemRoot, astPath.StripSlashes), true
+		}
+	}
+	return
 }

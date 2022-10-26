@@ -31,20 +31,20 @@ func (p Params) ByName(name string) string {
 	return ""
 }
 
+// Count returns the number of parameters.
+func (p Params) Count() int {
+	return len(p.names)
+}
+
 // Name returns the parameter name of the given index.
 func (p Params) Name(i int) string {
 	return p.names[i]
 }
 
-// Value returns the parameter value of ther given index.
+// Value returns the parameter value of the given index.
 func (p Params) Value(i int) string {
 	i = i << 1
 	return p.path[p.indices[i]:p.indices[i+1]]
-}
-
-// Count returns the number of parameters.
-func (p Params) Count() int {
-	return len(p.names)
 }
 
 // PathParams pulls the path parameters from a request context,

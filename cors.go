@@ -1,4 +1,4 @@
-package cors
+package rox
 
 import "github.com/valyala/fasthttp"
 

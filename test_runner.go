@@ -7,7 +7,6 @@ import (
 	"net/http/httputil"
 	"strconv"
 
-	"github.com/rohanthewiz/rox/core/constants"
 	"github.com/rohanthewiz/rox/test_helpers"
 	"github.com/valyala/fasthttp"
 )
@@ -19,12 +18,12 @@ import (
 // See rox_test.go for example usage
 func TestRunner(r *Rox, s *fasthttp.Server, req *http.Request) (resp *fasthttp.Response, err error) {
 	// Prepare Request
-	if req.Header.Get(constants.HeaderContentType) == "" {
-		req.Header.Add(constants.HeaderContentType, constants.ContentTypeText)
+	if req.Header.Get(HeaderContentType) == "" {
+		req.Header.Add(HeaderContentType, ContentTypeText)
 	}
 
-	if req.Body != http.NoBody && req.Header.Get(constants.HeaderContentLength) == "" {
-		req.Header.Add(constants.HeaderContentLength, strconv.FormatInt(req.ContentLength, 10))
+	if req.Body != http.NoBody && req.Header.Get(HeaderContentLength) == "" {
+		req.Header.Add(HeaderContentLength, strconv.FormatInt(req.ContentLength, 10))
 	}
 
 	reqRaw, err := httputil.DumpRequest(req, true)
