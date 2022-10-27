@@ -12,7 +12,7 @@ married to [Fasthttp](https://github.com/valyala/fasthttp). It is a fast and min
 - You need something fast - Fasthttp is the fastest server for Go, period. See https://web-frameworks-benchmark.netlify.app/result.
 
 ### Project Status - Alpha
-In your projects, be sure to use the same version of Fasthttp as used by Rox -- current 1.41.0
+In your projects it is recommended to use a version of Fasthttp close to that used by Rox -- currently 1.41.0
 
 ### Example
 (See also test cases in rox_test.go)
