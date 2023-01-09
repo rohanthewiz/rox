@@ -13,7 +13,7 @@ import (
 func TestRox(t *testing.T) {
 	r := initTestRox()
 	fsvr := &fasthttp.Server{ // Prepare the test server once
-		Handler: r.prepareServer(),
+		Handler: r.PrepareServer(),
 	}
 
 	type expectedResp struct {

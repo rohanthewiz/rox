@@ -37,7 +37,7 @@ func TestRunner(r *Rox, s *fasthttp.Server, req *http.Request) (resp *fasthttp.R
 	// Prepare Server, or we'll just work with the one passed in
 	if s == nil {
 		s = &fasthttp.Server{
-			Handler: r.prepareServer(),
+			Handler: r.PrepareServer(),
 		}
 	}
 

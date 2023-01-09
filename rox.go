@@ -65,7 +65,7 @@ func New(opts ...Options) *Rox {
 // Serve dispatches the request to the first handler
 // which matches to req.Method and req.Path.
 func (r *Rox) Serve() {
-	mainReqHandler := r.prepareServer()
+	mainReqHandler := r.PrepareServer()
 
 	if r.Options.Verbose {
 		fmt.Println("Rox listening on port:", r.Options.Port)
@@ -82,8 +82,8 @@ func (r *Rox) Serve() {
 	}
 }
 
-// prepareServer prepares the routes and main handlers
-func (r *Rox) prepareServer() fasthttp.RequestHandler {
+// PrepareServer prepares the routes and main handlers both for normal and test modes
+func (r *Rox) PrepareServer() fasthttp.RequestHandler {
 	if r.Options.Verbose {
 		fmt.Println("Preparing routes...")
 	}
