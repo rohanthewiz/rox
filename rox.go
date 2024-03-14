@@ -60,6 +60,11 @@ func New(opts ...Options) *Rox {
 	if len(opts) > 0 {
 		r.Options = opts[0]
 	}
+
+	// Validation / Fixup
+	if r.Options.VeryVerbose {
+		r.Options.Verbose = true
+	}
 	return r
 }
 
@@ -142,14 +147,16 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			path := string(ctx.Path())
 
 			if h := t.StaticMatch(path); h != nil {
-				fmt.Println("Direct match:", path)
+				fmt.Println("Route direct match:", path)
 				h(ctx, params)
 				return
 			}
 
 			h, patt := t.PatternMatch(path, &params)
-			if r.Options.VeryVerbose && h != nil && patt != "" {
-				fmt.Println("Pattern match:", path, "->", patt)
+			if h != nil && patt != "" {
+				if r.Options.VeryVerbose {
+					fmt.Println("Route pattern match:", path, "->", patt)
+				}
 				h(ctx, params)
 				return
 			}
@@ -161,7 +168,7 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			ctx.SetStatusCode(fasthttp.StatusNotFound)
 
 		} else {
-			const msg = "Unknown HTTP method"
+			msg := "Unknown HTTP method: " + string(ctx.Method())
 			log.Println(msg)
 			ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
 			_, _ = ctx.WriteString(msg)
