@@ -32,6 +32,7 @@ type Rox struct {
 
 type Options struct {
 	Verbose               bool
+	VeryVerbose           bool
 	Port                  string
 	TLS                   TLSOpts
 	assetPaths            []AssetPath
@@ -68,7 +69,7 @@ func (r *Rox) Serve() {
 	mainReqHandler := r.PrepareServer()
 
 	if r.Options.Verbose {
-		fmt.Println("Rox listening on port:", r.Options.Port)
+		fmt.Println("Server listening on port:", r.Options.Port)
 	}
 
 	if r.Options.TLS.UseTLS && r.Options.TLS.CertFile != "" {
@@ -84,7 +85,7 @@ func (r *Rox) Serve() {
 
 // PrepareServer prepares the routes and main handlers both for normal and test modes
 func (r *Rox) PrepareServer() fasthttp.RequestHandler {
-	if r.Options.Verbose {
+	if r.Options.VeryVerbose {
 		fmt.Println("Preparing routes...")
 	}
 	r.initTrees()
@@ -147,7 +148,7 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			}
 
 			h, patt := t.PatternMatch(path, &params)
-			if r.Options.Verbose && h != nil && patt != "" {
+			if r.Options.VeryVerbose && h != nil && patt != "" {
 				fmt.Println("Pattern match:", path, "->", patt)
 				h(ctx, params)
 				return
