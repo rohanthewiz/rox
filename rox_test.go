@@ -88,8 +88,8 @@ func TestRox(t *testing.T) {
 // initTestRox creates a Rox router for testing and initializes it with some routes
 func initTestRox() *Rox {
 	r := New(Options{
-		Verbose: true,
-		Port:    "3020",
+		VeryVerbose: true,
+		Port:        "3020",
 	})
 
 	var customNotFoundHdlr fasthttp.RequestHandler = func(ctx *fasthttp.RequestCtx) {
