@@ -147,7 +147,9 @@ func initStdMasterHandler(r *Rox) fasthttp.RequestHandler {
 			path := string(ctx.Path())
 
 			if h := t.StaticMatch(path); h != nil {
-				fmt.Println("Route direct match:", path)
+				if r.Options.VeryVerbose {
+					fmt.Println("Route direct match:", path)
+				}
 				h(ctx, params)
 				return
 			}
